@@ -1,31 +1,26 @@
 package com.oogie.jackson;
 
 import java.io.File;
-        import java.io.IOException;
         import java.math.BigDecimal;
         import java.util.ArrayList;
         import java.util.List;
-
-        import com.fasterxml.jackson.core.JsonGenerationException;
-        import com.fasterxml.jackson.databind.JsonMappingException;
         import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Jackson2Example {
+public class JavaToJSon {
 
     public static void main(String[] args) {
-        Jackson2Example obj = new Jackson2Example();
+        JavaToJSon obj = new JavaToJSon();
         obj.run();
     }
 
     private void run() {
         ObjectMapper mapper = new ObjectMapper();
-
         Staff staff = createDummyObject();
 
         try {
             // Convert object to JSON string and save into a file directly
             mapper.writeValue(new File("./src/main/resources/staff.json"), staff);
-            System.out.println("dir: " + new File("").getAbsoluteFile().toString());
+//            System.out.println("dir: " + new File("").getAbsoluteFile().toString());
 
             // Convert object to JSON string
             String jsonInString = mapper.writeValueAsString(staff);
@@ -35,17 +30,12 @@ public class Jackson2Example {
             jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(staff);
             System.out.println(jsonInString);
 
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private Staff createDummyObject() {
-
         Staff staff = new Staff();
 
         staff.setName("mkyong");
