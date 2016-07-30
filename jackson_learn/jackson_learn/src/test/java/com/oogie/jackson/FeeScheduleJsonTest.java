@@ -10,8 +10,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oogie.jackson.affiliate.ProductPackage;
 import org.junit.*;
 
 import java.io.File;
@@ -41,34 +39,35 @@ public class FeeScheduleJsonTest {
         instance = new FeeScheduleJSon(jsonFile);
     }
 
-    private JsonNode retrieveProductPackages_Sig_Choic_Adv_Ess() {
-        List<String> names = new ArrayList<String>();
-        names.add("productPackages");
-        return instance.findNode(names);
+    private JsonNode retriveProductPackages() {
+        return instance.findNode(createNames("productPackages"));
     }
 
     @Test
     public void findProductPackages() {
-        JsonNode node = retrieveProductPackages_Sig_Choic_Adv_Ess();
+        JsonNode node = retriveProductPackages();
 
         assertThat(node, notNullValue());
         assertThat(node.isArray(), is(true));
     }
 
+    private List<JsonNode> retrievePackage_Signature_Choic_Advtg_Essentl() {
+        JsonNode prodPkgNode = retriveProductPackages();
+        return instance.findNodes(prodPkgNode, "name", createNames("Signature", "SignatureChoice", "Advantage", "Essentials"));
+    }
+
     @Test
     public void findPackageNode() {
-        JsonNode prodPkgNode = retrieveProductPackages_Sig_Choic_Adv_Ess();
-        List<JsonNode> nodes = instance.findNodes(prodPkgNode, "name", createNames("Signature", "SignatureChoice", "Advantage", "Essentials"));
-
+        List<JsonNode> nodes = retrievePackage_Signature_Choic_Advtg_Essentl();
         assertThat(nodes, is(not(empty())));
     }
 
     private List<JsonNode> retrieveProductItems() {
-        JsonNode prodPkgNodes = retrieveProductPackages_Sig_Choic_Adv_Ess();
+        JsonNode prodPkgNodes = retriveProductPackages();
         List<JsonNode> prodItemNodes = new ArrayList<JsonNode>();
 
-        // Use the first prodPkgNode
         for(JsonNode node : prodPkgNodes) {
+            // Check the 1st ProdPkgNode
             prodItemNodes = instance.retrieveProductItems(node, createNames("GenExam", "Lens", "Frame", "Refraction"));
             break;
         }
@@ -78,7 +77,7 @@ public class FeeScheduleJsonTest {
     @Test
     public void findProductItems_GenExam_Lens_Frame_Refraction() {
         List<JsonNode> nodes = retrieveProductItems();
-        assertThat(nodes, hasSize(3));
+        assertThat(nodes, hasSize(4));
     }
 
     private List<String> createNames(String ... names) {
@@ -91,13 +90,12 @@ public class FeeScheduleJsonTest {
         List<JsonNode> prodItemNodes = retrieveProductItems();
         List<JsonNode> constraintNodes = new ArrayList<JsonNode>();
 
-        // Use the first prodPkgNode
         for(JsonNode node : prodItemNodes) {
-            prodItemNodes = instance.retrieveCoverageConstraints(node, createNames("VWRKQ", "VWRKQ"));
+            //Use the first Product Item
+            constraintNodes = instance.retrieveCoverageConstraints(node, createNames("VWRK", "VWRKQ"));
             break;
         }
         return constraintNodes;
-//        assertThat(prodItemNodes, hasSize(3));
     }
 
     @Test
